@@ -1,14 +1,3 @@
-"""Experiments for the report: vary the utility function, the number of
-cycles, the number of expansion nodes (x) and the height of the tree.
-
-Every setting is run RUNS times on three test positions, each run with a
-different random seed, and we record which move is generated. Some settings
-also play full games. Results are written to results/*.csv.
-
-Run:  python3 experiments.py            (about 4 minutes)
-      python3 experiments.py --runs 5   (quicker, less data)
-"""
-
 import argparse
 import csv
 import os
@@ -22,12 +11,9 @@ from mcts import build_tree, best_move, monte_carlo_tree_search, play_game, rand
 GAME = ConnectFour()
 
 POSITIONS = {
-    # Opening move: no tactics, every move is legal.
     'empty': GAME.initial,
-    # Middle game with no immediate win or loss for either player.
     'midgame': state_from_rows(GAME, ['.......', '.......', '.......',
                                       '...O...', '..XX...', '.OXOX.O'], 'X'),
-    # O threatens to win on the diagonal at (4, 4); X must block there.
     'block': state_from_rows(GAME, ['.......', '.......', '.......',
                                     '..OX...', '.OXO...', 'OXOX..X'], 'X'),
 }
@@ -48,7 +34,6 @@ def count_nodes(root):
 
 
 def run_setting(config, runs):
-    """Generate a move RUNS times (seeds 0..RUNS-1) for each position."""
     row = {}
     for name, state in POSITIONS.items():
         moves, seconds, nodes = [], 0.0, 0
@@ -60,7 +45,7 @@ def run_setting(config, runs):
             moves.append(best_move(root))
         counts = Counter(moves)
         top, top_count = counts.most_common(1)[0]
-        row[f'{name}_top_move'] = f'{top[0]}'  # column of the most common move
+        row[f'{name}_top_move'] = f'{top[0]}'
         row[f'{name}_same_%'] = round(100 * top_count / runs)
         row[f'{name}_distinct'] = len(counts)
         if name == 'block':
@@ -74,8 +59,6 @@ def run_setting(config, runs):
 
 
 def match(config_a, config_b, games):
-    """config_a plays config_b (or the random player if config_b is None),
-    alternating who moves first. Returns (wins, draws, losses) for config_a."""
     w = d = l = 0
     for g in range(games):
         rng = random.Random(1000 + g)
@@ -111,7 +94,6 @@ def main():
     parser.add_argument('--games', type=int, default=20, help='games per match')
     args = parser.parse_args()
 
-    # 1. Utility function: weight of the objective part (W) and of exploration (C)
     rows = []
     for C, W in [(1.4, 0.0), (1.4, 0.5), (1.4, 1.0), (1.4, 2.0), (1.4, 5.0),
                  (0.5, 1.0), (3.0, 1.0)]:
@@ -119,28 +101,24 @@ def main():
         rows.append(dict(C=C, W=W, **run_setting(config, args.runs)))
     save('exp1_utility', rows)
 
-    # 2. Number of cycles
     rows = []
     for cycles in [10, 50, 100, 250, 500, 1000, 2000]:
         config = dict(DEFAULT, cycles=cycles)
         rows.append(dict(cycles=cycles, **run_setting(config, args.runs)))
     save('exp2_cycles', rows)
 
-    # 3. Number of nodes expanded at each level (x)
     rows = []
     for x in [1, 2, 3, 4, 5, 6, 7]:
         config = dict(DEFAULT, expand_x=x)
         rows.append(dict(x=x, **run_setting(config, args.runs)))
     save('exp3_expansion', rows)
 
-    # 4. Height of the tree
     rows = []
     for height in [1, 2, 3, 4, 6, 8]:
         config = dict(DEFAULT, height=height)
         rows.append(dict(height=height, **run_setting(config, args.runs)))
     save('exp4_height', rows)
 
-    # 5. Same seed vs different seeds (is the same move always generated?)
     rows = []
     for cycles in [50, 500]:
         for seeded in (True, False):
@@ -154,7 +132,6 @@ def main():
                              moves=' '.join(f'{m[0]}:{c}' for m, c in sorted(counts.items()))))
     save('exp5_seed', rows)
 
-    # 6. Playing strength in full games (fewer cycles to keep the run time down)
     base = dict(DEFAULT, cycles=200)
     matches = [
         ('W=1 vs random player', base, None),

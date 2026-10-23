@@ -1,6 +1,4 @@
 {
-  "_comment": "Boards are 6 rows, top row first, 7 columns left to right ('X', 'O' or '.'). Moves are [column, row] with column 1..7 and row 1..6 counted from the bottom.",
-
   "rules": [
     {
       "name": "horizontal_win_X",

@@ -1,5 +1,3 @@
-"""Tests for the MCTS move generator (mcts.py), using tests/test_data/positions.json."""
-
 import json
 import math
 import os
@@ -10,8 +8,8 @@ import unittest
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
 
-from games import ConnectFour, state_from_rows  # noqa: E402
-from mcts import (MCT_Node, build_tree, best_move, monte_carlo_tree_search,  # noqa: E402
+from games import ConnectFour, state_from_rows
+from mcts import (MCT_Node, build_tree, best_move, monte_carlo_tree_search,
                   objective, utility, play_game, random_player)
 
 with open(os.path.join(HERE, 'test_data', 'positions.json')) as f:
@@ -27,7 +25,6 @@ def all_nodes(root):
 
 
 class TestObjective(unittest.TestCase):
-
     def setUp(self):
         self.game = ConnectFour()
 
@@ -35,7 +32,7 @@ class TestObjective(unittest.TestCase):
         self.assertEqual(objective(self.game, self.game.initial, 'X'), 0.0)
 
     def test_won_and_lost_states(self):
-        case = DATA['rules'][0]  # X has won
+        case = DATA['rules'][0]
         s = state_from_rows(self.game, case['rows'])
         self.assertEqual(objective(self.game, s, 'X'), 1)
         self.assertEqual(objective(self.game, s, 'O'), -1)
@@ -62,7 +59,6 @@ class TestObjective(unittest.TestCase):
 
 
 class TestUtility(unittest.TestCase):
-
     def test_unvisited_node_is_infinite(self):
         parent = MCT_Node(N=10)
         self.assertEqual(utility(MCT_Node(parent=parent), C=1.4, W=1.0), math.inf)
@@ -81,7 +77,6 @@ class TestUtility(unittest.TestCase):
 
 
 class TestMoveGenerator(unittest.TestCase):
-
     def setUp(self):
         self.game = ConnectFour()
 
@@ -90,7 +85,6 @@ class TestMoveGenerator(unittest.TestCase):
         self.assertIn(move, self.game.actions(self.game.initial))
 
     def test_tactical_positions(self):
-        """Finds the winning move and blocks the opponent's winning move."""
         for case in DATA['tactics']:
             s = state_from_rows(self.game, case['rows'], case['to_move'])
             for seed in range(5):
@@ -103,7 +97,6 @@ class TestMoveGenerator(unittest.TestCase):
         for cycles in (1, 10, 250):
             root = build_tree(self.game.initial, self.game, cycles=cycles, seed=0)
             self.assertEqual(root.N, cycles)
-            # every cycle passes through exactly one child of the root
             self.assertEqual(sum(c.N for c in root.children), cycles)
 
     def test_tree_never_deeper_than_height(self):
@@ -128,14 +121,13 @@ class TestMoveGenerator(unittest.TestCase):
         all_values = sorted(objective(self.game, self.game.result(self.game.initial, a), 'X')
                             for a in self.game.actions(self.game.initial))
         self.assertEqual(chosen, all_values[-3:])
-        self.assertIn((4, 1), root.children.values())  # centre column is best
+        self.assertIn((4, 1), root.children.values())
 
     def test_statistics_are_consistent(self):
         root = build_tree(self.game.initial, self.game, cycles=400, seed=1)
         for n in all_nodes(root):
             self.assertTrue(0 <= n.U <= n.N)
             if n.children:
-                # a node is visited once more than its children: the cycle that created them
                 self.assertLessEqual(sum(c.N for c in n.children), n.N)
 
     def test_best_move_has_most_playouts(self):

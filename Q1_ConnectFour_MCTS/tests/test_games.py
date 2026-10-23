@@ -1,5 +1,3 @@
-"""Tests for the Connect Four rules (games.py), using tests/test_data/positions.json."""
-
 import json
 import os
 import sys
@@ -8,20 +6,19 @@ import unittest
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
 
-from games import ConnectFour, state_from_rows  # noqa: E402
+from games import ConnectFour, state_from_rows
 
 with open(os.path.join(HERE, 'test_data', 'positions.json')) as f:
     DATA = json.load(f)
 
 
 class TestConnectFourRules(unittest.TestCase):
-
     def setUp(self):
         self.game = ConnectFour()
 
     def test_board_is_6_rows_by_7_columns(self):
-        self.assertEqual(self.game.h, 7)  # columns
-        self.assertEqual(self.game.v, 6)  # rows
+        self.assertEqual(self.game.h, 7)
+        self.assertEqual(self.game.v, 6)
         self.assertEqual(self.game.k, 4)
         self.assertEqual(len(self.game.initial.moves), 42)
 
