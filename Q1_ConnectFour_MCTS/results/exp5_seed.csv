@@ -1,0 +1,5 @@
+cycles,seed,same_move_pct,moves
+50,same (0),100,3:20
+50,different,55,2:2 3:11 5:7
+500,same (0),100,3:20
+500,different,60,3:12 5:8

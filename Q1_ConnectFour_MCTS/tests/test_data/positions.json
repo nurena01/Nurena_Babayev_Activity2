@@ -1,0 +1,82 @@
+{
+  "_comment": "Boards are 6 rows, top row first, 7 columns left to right ('X', 'O' or '.'). Moves are [column, row] with column 1..7 and row 1..6 counted from the bottom.",
+
+  "rules": [
+    {
+      "name": "horizontal_win_X",
+      "rows": [".......", ".......", ".......", ".......", "OOO....", "XXXX..."],
+      "terminal": true, "utility_X": 1
+    },
+    {
+      "name": "vertical_win_O",
+      "rows": [".......", ".......", "O......", "O.....X", "O....XX", "O...XXX"],
+      "to_move": "X",
+      "terminal": true, "utility_X": -1
+    },
+    {
+      "name": "diagonal_up_win_X",
+      "rows": [".......", ".......", "...X...", "..XO...", ".XOO...", "XOOX.X."],
+      "terminal": true, "utility_X": 1
+    },
+    {
+      "name": "diagonal_down_win_O",
+      "rows": [".......", ".......", "O......", "XO.....", "XXO....", "XXXO.OO"],
+      "terminal": true, "utility_X": -1
+    },
+    {
+      "name": "full_board_draw",
+      "rows": ["OOXXOOX", "XXOOXXO", "OOXXOOX", "XXOOXXO", "OOXXOOX", "XXOOXXO"],
+      "terminal": true, "utility_X": 0
+    },
+    {
+      "name": "not_finished",
+      "rows": [".......", ".......", ".......", ".......", "...O...", "..XXO.."],
+      "terminal": false, "utility_X": 0,
+      "legal_moves": [[1, 1], [2, 1], [3, 2], [4, 3], [5, 2], [6, 1], [7, 1]]
+    },
+    {
+      "name": "full_column_not_legal",
+      "rows": ["X......", "O......", "X......", "O......", "X......", "O.....X"],
+      "terminal": false, "utility_X": 0,
+      "legal_moves": [[2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 2]]
+    }
+  ],
+
+  "tactics": [
+    {
+      "name": "win_horizontal",
+      "rows": [".......", ".......", ".......", ".......", "OO.....", "XXX...O"],
+      "to_move": "X", "expected": [4, 1]
+    },
+    {
+      "name": "block_horizontal",
+      "rows": [".......", ".......", ".......", ".......", "XX.....", "OOO...X"],
+      "to_move": "X", "expected": [4, 1]
+    },
+    {
+      "name": "win_vertical",
+      "rows": [".......", ".......", ".......", "X......", "XO.....", "XO...O."],
+      "to_move": "X", "expected": [1, 4]
+    },
+    {
+      "name": "block_vertical",
+      "rows": [".......", ".......", ".......", "O......", "OX.....", "OX...X."],
+      "to_move": "X", "expected": [1, 4]
+    },
+    {
+      "name": "win_diagonal",
+      "rows": [".......", ".......", ".......", "..XO...", ".XOX...", "XOXO..O"],
+      "to_move": "X", "expected": [4, 4]
+    },
+    {
+      "name": "block_diagonal",
+      "rows": [".......", ".......", ".......", "..OX...", ".OXO...", "OXOX..X"],
+      "to_move": "X", "expected": [4, 4]
+    },
+    {
+      "name": "win_before_block",
+      "rows": [".......", ".......", ".......", "O......", "O......", "O...XXX"],
+      "to_move": "X", "expected": [4, 1]
+    }
+  ]
+}
